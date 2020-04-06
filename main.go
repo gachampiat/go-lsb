@@ -11,10 +11,8 @@ func main(){
 	image, err := image.New("image.bmp")
 	defer image.Close()
 	utils.CheckError(err)
-	lsb := lsb.LSB{
-		Bmp : image,
-		Message : b,
-	}
+	lsb, err := lsb.NewLSB(image, b)
+	utils.CheckError(err)
 	err = lsb.InsertData()
 	utils.CheckError(err)
 

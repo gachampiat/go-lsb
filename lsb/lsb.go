@@ -11,12 +11,22 @@ type LSB struct {
 	Message []byte
 }
 
-func (l *LSB) InsertData()(error){
-	if l.checkCapability(){
-		return fmt.Errorf("Use an other stega-medium for this message (stege-medium capability=%d, message lenght=%d)", l.Bmp.Size/8, len(l.Message))
+func NewLSB(bmp *image.BMP, message []byte) (*LSB, error){
+	lsb := &LSB{
+		Bmp : bmp,
+		Message : message,
 	}
-	l.Bmp.SetSeekAtStartAddress()
 
+	if lsb.checkCapability(){
+		return nil, fmt.Errorf("Use an other stega-medium for this message (stege-medium capability=%d, message lenght=%d)", lsb.Bmp.Size/8, len(lsb.Message))
+	}
+	
+	lsb.Bmp.SetSeekAtStartAddress()
+
+	return lsb, nil
+}
+
+func (l *LSB) InsertData()(error){
 	for _, bits := range l.Message{
 		var i uint8
 		for i = 0; i < 8; i++ {
