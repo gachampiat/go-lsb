@@ -8,10 +8,12 @@ import (
 
 func main(){
 	b := []byte("AZERTYUIOP")
-	image, err := image.New("image.bmp")
+	path := "image.bmp"
+	utils.CopyFile(path, "lsb_image.bmp")
+	image, err := image.New("lsb_image.bmp")
 	defer image.Close()
 	utils.CheckError(err)
-	lsb, err := lsb.NewLSB(image, b)
+	lsb, err := lsb.NewLSBEncoder(image, b)
 	utils.CheckError(err)
 	err = lsb.InsertData()
 	utils.CheckError(err)

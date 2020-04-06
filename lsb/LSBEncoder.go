@@ -10,13 +10,13 @@ import(
 	"go-lsb/utils"
 )
 
-type LSB struct {
+type LSBEncoder struct {
 	Bmp *image.BMP
 	Message []byte
 }
 
-func NewLSB(bmp *image.BMP, message []byte) (*LSB, error){
-	lsb := &LSB{
+func NewLSBEncoder(bmp *image.BMP, message []byte) (*LSBEncoder, error){
+	lsb := &LSBEncoder{
 		Bmp : bmp,
 		Message : message,
 	}
@@ -30,24 +30,24 @@ func NewLSB(bmp *image.BMP, message []byte) (*LSB, error){
 	return lsb, nil
 }
 
-func (l *LSB) InsertData()(error){
+func (l *LSBEncoder) InsertData()(error){
 	l.writeHeader()
 	for _, bits := range l.Message{
 		var i uint8
 		for i = 0; i < 8; i++ {
 			bit := (bits & byte(1<<i)) >> i
-			fmt.Print(bit)
+			l.writeBit(int32(bit))
 		}
 	}
 
 	return nil
 }
 
-func (l *LSB) checkCapability() bool{
+func (l *LSBEncoder) checkCapability() bool{
 	return int64(len(l.Message)) > (l.Bmp.Size / int64(8))
 }
 
-func (l *LSB) writeHeader() error{
+func (l *LSBEncoder) writeHeader() error{
 	bits := utils.IntToBits(int64(len(l.Message)))
 	fmt.Printf("BITS : %s\n", bits)
 	for _, bit := range bits{
@@ -56,16 +56,11 @@ func (l *LSB) writeHeader() error{
 	return nil 
 }
 
-func (l *LSB) writeBit(bit int32)(error){
-	seek, err := l.Bmp.GetSeekValue()
-	if err != nil {
-		return err
-	}
+func (l *LSBEncoder) writeBit(bit int32)(error){
+	seek := l.Bmp.GetSeekValue()
 
 	buf := make([]byte, 1)
-	
-	fmt.Printf("SEEK VALUE : %d \n", seek)
-	_, err = l.Bmp.File.ReadAt(buf, seek)
+	_, err := l.Bmp.File.ReadAt(buf, seek)
 	if err != nil && err != io.EOF{
 		return err
 	}
@@ -81,14 +76,14 @@ func (l *LSB) writeBit(bit int32)(error){
 		slice [7] = strconv.Itoa(int(bit))
 		bits = strings.Join(slice, "")
 	}
-
-	fmt.Printf("SEEK VALUE : %d \n", seek)
-	_, err = l.Bmp.File.WriteAt([]byte(bits), seek)
+	i, err := strconv.ParseInt(bits, 2, 64)	
+	if err != nil {
+		return err
+	}
+	_, err = l.Bmp.File.Write([]byte(strconv.Itoa(int(i))))
 	if err != nil && err != io.EOF{
 		return err
 	}
-	l.Bmp.SetSeekValue(seek + 1)
-	fmt.Printf("SEEK VALUE : %d \n", seek)
 
 	return nil
 }
