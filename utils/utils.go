@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"os"
 	"log"
+	"encoding/binary"
+	"bytes"
+	"strconv"
 )
 
 func CopyFile(src, dst string)error{
@@ -39,4 +42,17 @@ func CheckError(err error){
 	if err != nil{
 		log.Fatal(err)
 	}
+}
+
+func ByteToInt(slice []byte)(int64){
+	buff := bytes.NewBuffer(slice)
+	int, err := binary.ReadVarint(buff)
+	if err != nil{
+		log.Fatal(err) 
+	}
+	return int
+}
+
+func IntToBits(value int64) string{
+	return fmt.Sprintf("%08s", strconv.FormatInt(value, 2))
 }

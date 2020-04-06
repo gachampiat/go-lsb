@@ -61,3 +61,19 @@ func (b *BMP) SetSeekAtStartAddress()error{
 		return nil
 	}
 }
+
+func (b *BMP) GetSeekValue()(int64, error){
+	if n, err := b.File.Seek(0, 1); err != nil{
+		return 0, err
+	} else {
+		return n, nil
+	}
+}
+
+func (b *BMP) SetSeekValue(value int64) (error){
+	if _, err := b.File.Seek(value, 0); err != nil{
+		return err
+	} else {
+		return nil
+	}
+}
