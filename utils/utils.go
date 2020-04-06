@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"os"
+	"log"
 )
 
 func CopyFile(src, dst string)error{
@@ -32,4 +33,10 @@ func CopyFile(src, dst string)error{
 		}
 	}
 	return nil 
+}
+
+func CheckError(err error){
+	if err != nil{
+		log.Fatal(err)
+	}
 }

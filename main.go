@@ -1,16 +1,21 @@
 package main
 
 import (
-	"fmt"
-	"log"
-
 	"go-lsb/image"
+	"go-lsb/lsb"
+	"go-lsb/utils"
 )
 
 func main(){
-	test, e := image.New("image.bmp")
-	if e != nil {
-		log.Fatal(e)
+	b := []byte("AZERTYUIOP")
+	image, err := image.New("image.bmp")
+	defer image.Close()
+	utils.CheckError(err)
+	lsb := lsb.LSB{
+		Bmp : image,
+		Message : b,
 	}
-	fmt.Println(test)
-}
+	err = lsb.InsertData()
+	utils.CheckError(err)
+
+}	
