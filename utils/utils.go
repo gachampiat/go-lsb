@@ -56,3 +56,7 @@ func ByteToInt(slice []byte)(int64){
 func IntToBits(value int64) string{
 	return fmt.Sprintf("%08s", strconv.FormatInt(value, 2))
 }
+
+func GetLSB(slice byte) uint8{
+	return slice
+}

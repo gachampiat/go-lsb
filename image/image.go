@@ -59,12 +59,12 @@ func (b *BMP) SetSeekAtStartAddress()error{
 	if _, err := b.File.Seek(b.Start, 0); err != nil{
 		return err
 	} else {
-		b.updateSeekValue() 
+		b.UpdateSeekValue() 
 		return nil
 	}
 }
 
-func (b *BMP) updateSeekValue(){
+func (b *BMP) UpdateSeekValue(){
 	if n, err := b.File.Seek(0, 1); err != nil{
 		fmt.Printf("Error update value seek : %s \n", err)
 	} else {
@@ -76,12 +76,12 @@ func (b *BMP) SetSeekValue(value int64) (error){
 	if _, err := b.File.Seek(value, 0); err != nil{
 		return err
 	} else {
-		b.updateSeekValue()
+		b.UpdateSeekValue()
 		return nil
 	}
 }
 
 func (b *BMP) GetSeekValue() int64 {
-	b.updateSeekValue()
+	b.UpdateSeekValue()
 	return b.Seek
 }
