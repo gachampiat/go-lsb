@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 	"log"
-	"encoding/binary"
-	"bytes"
 	"strconv"
 )
 
@@ -44,19 +42,15 @@ func CheckError(err error){
 	}
 }
 
-func ByteToInt(slice []byte)(int64){
-	buff := bytes.NewBuffer(slice)
-	int, err := binary.ReadVarint(buff)
-	if err != nil{
-		log.Fatal(err) 
-	}
-	return int
-}
-
 func IntToBits(value int64) string{
 	return fmt.Sprintf("%08s", strconv.FormatInt(value, 2))
 }
 
-func GetLSB(slice byte) uint8{
-	return slice
+func ByteSliceToInt(slice []byte)int{
+	int_val := 0
+	for i := 0; i <len(slice); i++{
+		int_val = int_val << 1
+		int_val = int(slice[i]) | int_val
+	}
+	return int_val
 }
