@@ -37,7 +37,6 @@ func (l *LSBEncoder) InsertData()(error){
 	// l.writeHeader()
 	for _, bits := range l.Message{
 		var i uint8
-		fmt.Printf("%b \n", bits)
 		for i = 0; i < 8; i++ {
 			bit := (bits & byte(1<<i)) >> i
 			l.writeBit(int32(bit))

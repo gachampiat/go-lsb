@@ -20,14 +20,12 @@ func NewLSBDecoder(bmp *image.BMP)(*LSBDecoder){
 	return lsb
 }
 
-func (l *LSBDecoder) Decode()(string, error){
-	buf := l.ReadNBytes(8)
-	fmt.Printf("Value : %c\n", utils.ByteSliceToInt(buf))
-	buf = l.ReadNBytes(8)
-	fmt.Printf("Value : %c\n", utils.ByteSliceToInt(buf))
-	buf = l.ReadNBytes(8)
-	fmt.Printf("Value : %c\n", utils.ByteSliceToInt(buf))
-	return "", nil 
+func (l *LSBDecoder) Decode(lenght int )(msg []byte){
+	for i := 0; i < lenght; i++{
+		buf := l.ReadNBytes(8)
+		msg = append(msg, byte(utils.ByteSliceToInt(buf)))
+	}
+	return msg
 }
 
 func (l *LSBDecoder) ReadNBytes(n int)([]byte){

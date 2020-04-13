@@ -50,7 +50,11 @@ func ByteSliceToInt(slice []byte)int{
 	int_val := 0
 	for i := 0; i <len(slice); i++{
 		int_val = int_val << 1
-		int_val = int(slice[i]) | int_val
+		int_val = int(GetLsb(slice[i])) | int_val
 	}
 	return int_val
+}
+
+func GetLsb (value byte)byte{
+	return  value << 7 >> 7
 }
