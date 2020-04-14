@@ -8,29 +8,22 @@ import (
 )
 
 func main(){
-	message := "Coucou axel tu es pas tres bon enfaite"
-	key := []byte("the-key-has-to-be-32-bytes-long!")
+	message := "Coucou axel tu es pas trés bon enfaite"
 	text := []byte(message)
 
-	ciphertext, err := utils.Encrypt(text, key)
-    if err != nil {
-        // TODO: Properly handle error
-        fmt.Println(err)
-	}
 	path := "image.bmp"
 	utils.CopyFile(path, "lsb_image.bmp")
 	image, err := image.New("lsb_image.bmp")
 	defer image.Close()
 	utils.CheckError(err)
 
-	encoder, err := lsb.NewLSBEncoder(image, ciphertext)
+	var LSB lsb.Ilsb
+	LSB, err = lsb.NewBMP(image)
 	utils.CheckError(err)
-	
-	err = encoder.InsertData()
+ 	err = LSB.InsertData(text)
 	utils.CheckError(err)
 
-	decoder := lsb.NewLSBDecoder(image)
-	msg_decoded, err := utils.Decrypt(decoder.Decode(len(ciphertext)), key)
-	utils.CheckError(err)
-	fmt.Printf("%s\n", msg_decoded)
+	buf := make([]byte, len(message))
+	buf, err = LSB.RetriveData(len(message))
+	fmt.Println(string(buf))
 }	
