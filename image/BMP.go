@@ -47,14 +47,6 @@ func (b *BMP) Close(){
 	b.File.Close()
 }
 
-func (b *BMP) GetFile()(*os.File){
-	return b.File
-}
-
-func (b *BMP) GetStartAddress() (int64){
-	return b.Start
-}
-
 func (b *BMP) SetSeekAtStartAddress()error{
 	if _, err := b.File.Seek(b.Start, 0); err != nil{
 		return err

@@ -5,7 +5,14 @@ import (
 	"os"
 	"log"
 	"strconv"
+	"hash/fnv"
 )
+
+func Hash(s string) uint64 {
+	h := fnv.New64()
+	h.Write([]byte(s))
+	return h.Sum64()
+}
 
 func CopyFile(src, dst string)error{
 	buf := make([]byte, 100)
@@ -57,4 +64,13 @@ func ByteSliceToInt(slice []byte)int{
 
 func GetLsb (value byte)byte{
 	return  value << 7 >> 7
+}
+
+func GetValidRand(number int, array []int)bool{
+	for _, value := range(array){
+		if number == value{
+			return false
+		}
+	}
+	return true
 }
