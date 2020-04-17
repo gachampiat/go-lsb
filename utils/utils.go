@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"log"
-	"strconv"
 	"hash/fnv"
 	"crypto/rc4"
 	"io"
@@ -53,10 +52,6 @@ func CheckError(err error){
 	}
 }
 
-func IntToBits(value int64) string{
-	return fmt.Sprintf("%08s", strconv.FormatInt(value, 2))
-}
-
 func ByteSliceToInt(slice []byte)int{
 	int_val := 0
 	for i := 0; i <len(slice); i++{
@@ -66,7 +61,7 @@ func ByteSliceToInt(slice []byte)int{
 	return int_val
 }
 
-func GetLsb (value byte)byte{
+func GetLsb(value byte)byte{
 	return  value << 7 >> 7
 }
 

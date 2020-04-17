@@ -50,6 +50,9 @@ func (l *BMPLSB) InsertData(data []byte)(error){
 	}
 	l.Bmp.Close()
 	return nil
+}func (b *BMP) GetSeekValue() int64 {
+	b.UpdateSeekValue()
+	return b.Seek
 }
 
 func (l *BMPLSB) checkCapability(data []byte) bool{
