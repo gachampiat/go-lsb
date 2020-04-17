@@ -17,7 +17,7 @@ func NewBMPLSBRandomer(BmpLsb *BMPLSB, seed string) (*BMPLSBRandomer, error){
 		BmpLsb : BmpLsb,
 		Seed : seed,
 	}
-
+	rand.Seed(int64(utils.Hash(seed)))
 	return lsb, nil
 }
 
@@ -25,18 +25,13 @@ func (b BMPLSBRandomer) InsertData(data []byte)(error){
 	if b.BmpLsb.checkCapability(data){
 		return fmt.Errorf("Please choose another stego-medium")
 	}
-	index_used := make([]int, 10)
-	rand.Seed(int64(utils.Hash(b.Seed)))
+	index_used := make([]int64, 10)
 	for _, bits := range data{
 		var i uint8
 		for i = 0; i < 8; i++ {
 			bit := (bits & byte(1<<i)) >> i
-			number := rand.Intn(int(b.BmpLsb.Bmp.Size))
-			for !utils.GetValidRand(number, index_used){
-				fmt.Println("Index already used")
-				number= rand.Intn(int(b.BmpLsb.Bmp.Size))
-			}
-			err := b.BmpLsb.Bmp.SetSeekValue(int64(number))
+			number := getNextInt(b.BmpLsb.Bmp.Size, index_used)
+			err := b.BmpLsb.Bmp.SetSeekValue(number)
 			if err != nil{
 				return err
 			}
@@ -46,23 +41,17 @@ func (b BMPLSBRandomer) InsertData(data []byte)(error){
 			}
 		}
 	}
-	
 	b.BmpLsb.Bmp.Close()
 	return nil
 }
 
 func (b BMPLSBRandomer) RetriveData(lenght int)(msg []byte, err error){
-	index_used := make([]int, 10)
-	rand.Seed(int64(utils.Hash(b.Seed)))
+	index_used := make([]int64, 10)
 	for i := 0; i < lenght; i++{
 		buf := make([]byte,  8)
 		for j := 0 ; j < 8; j ++{
-			number := rand.Intn(int(b.BmpLsb.Bmp.Size))
-			for !utils.GetValidRand(number, index_used){
-				fmt.Println("Index already used")
-				number= rand.Intn(int(b.BmpLsb.Bmp.Size))
-			}
-			err := b.BmpLsb.Bmp.SetSeekValue(int64(number))
+			number := getNextInt(b.BmpLsb.Bmp.Size, index_used)
+			err := b.BmpLsb.Bmp.SetSeekValue(number)
 			if err != nil{
 				return nil, err
 			}
@@ -73,4 +62,13 @@ func (b BMPLSBRandomer) RetriveData(lenght int)(msg []byte, err error){
 
 	b.BmpLsb.Bmp.Close()
 	return msg, nil
+}
+
+func getNextInt(maxVal int64, index_used []int64) int64{
+	number := rand.Int63n(maxVal)
+	for !utils.GetValidRand(number, index_used){
+		number= rand.Int63n(maxVal)
+	}
+	index_used = append(index_used, number)
+	return number
 }
