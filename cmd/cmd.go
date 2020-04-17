@@ -5,6 +5,7 @@ import (
 	"flag"
 	"os"
 	"strconv"
+	"io/ioutil"
 
 
 	"go-lsb/utils"
@@ -12,7 +13,7 @@ import (
 )
 
 func Execute(){
-	inst := flag.Bool("insert", false, "Insertion de données\nUsage : -insert $src_file $dst_file $msg")
+	inst := flag.Bool("insert", false, "Insertion de données\nUsage : -insert $src_file $dst_file $msg_file")
 	rtve := flag.Bool("retrive", false, "Recupération de données\nUsage : -retrive $src_file $msg_lenght")
 	key := flag.String("key", "", "Chiffrer l'entrée utilisateur\nUsage : -key $key")
 	seed := flag.String("seed", "", "Insertion aléatoire des données\nUsage : -seed $seed")
@@ -45,9 +46,18 @@ func insert(key, seed string, argv []string){
 	err := utils.CopyFile(argv[0], argv[1])
 	utils.CheckError(err)
 
+	if _, err := os.Stat(argv[2]); os.IsNotExist(err) {
+		fmt.Println(err)
+        return
+	}
+
+	message := make([]byte, 20)
+	message, err = ioutil.ReadFile(argv[2])
+	utils.CheckError(err)
+	
 	encrypt := key != ""
 	randomise := seed != ""
-	message := []byte(argv[2])
+	
 	
 	if encrypt {
 		message, err = utils.RC4Encryption([]byte(key), message)
