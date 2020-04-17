@@ -3,7 +3,6 @@ package image
 import (
 	"os"
 	"fmt"
-	"io"
 	"encoding/binary"
 )
 
@@ -27,10 +26,9 @@ func New(path string) (*BMP, error){
 	// get the start address
 	var start [4]byte
 	_, err = f.ReadAt(start[:], 10)
-	if err != nil && err != io.EOF{
+	if err != nil {
 		return nil, fmt.Errorf("Read at error : %s", path)
 	}
-
 	stat, err := f.Stat()
 	if err != nil {
 		return nil, err

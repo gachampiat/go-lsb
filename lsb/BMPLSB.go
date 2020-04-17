@@ -12,17 +12,21 @@ type BMPLSB struct {
 	Bmp *image.BMP
 }
 
-func NewBMP(bmp *image.BMP) (*BMPLSB, error){
+func NewBMP(filename string) (*BMPLSB, error){
+	image, err := image.New(filename)
+	if err != nil {
+		return nil, err
+	}
 	lsb := &BMPLSB{
-		Bmp : bmp,
+		Bmp : image,
 	}
 
-	err := lsb.Bmp.SetSeekAtStartAddress()
+	err = lsb.Bmp.SetSeekAtStartAddress()
 	if err != nil{
 		return nil, err
 	}
 
-	return lsb, nil
+	return lsb, nil 
 }
 
 func (l *BMPLSB) InsertData(data []byte)(error){
@@ -33,7 +37,10 @@ func (l *BMPLSB) InsertData(data []byte)(error){
 		var i uint8
 		for i = 0; i < 8; i++ {
 			bit := (bits & byte(1<<i)) >> i
-			l.writeBit(int32(bit))
+			err := l.writeBit(int32(bit))
+			if err != nil{
+				return err
+			}
 		}
 	}
 
@@ -41,14 +48,13 @@ func (l *BMPLSB) InsertData(data []byte)(error){
 	if err != nil{
 		return err
 	}
-
+	l.Bmp.Close()
 	return nil
 }
 
 func (l *BMPLSB) checkCapability(data []byte) bool{
 	return int64(len(data)) > (l.Bmp.Size / int64(8))
 }
-
 
 func (b *BMPLSB) writeBit(bit int32)(error){
 	buf:= make([]byte, 1)
@@ -80,7 +86,7 @@ func (b *BMPLSB) RetriveData(lenght int)(msg []byte, err error){
 	if err != nil{
 		return nil, err
 	}
-
+	b.Bmp.Close()
 	return msg, nil
 }
 
@@ -93,6 +99,7 @@ func (l *BMPLSB) ReadNBytes(n int)([]byte){
 	return buf
 
 }
+
 func (l *BMPLSB) ReadByte()(byte){
 	buf:= make([]byte, 1)
 	l.Bmp.UpdateSeekValue()

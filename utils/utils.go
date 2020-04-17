@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"hash/fnv"
 	"crypto/rc4"
+	"io"
 	
 )
 
@@ -31,7 +32,7 @@ func CopyFile(src, dst string)error{
 
 	for {
 		n, err := f.Read(buf)
-		if err != nil {
+		if err != nil && err != io.EOF{
 				return err
 		}
 		if n == 0 {
@@ -48,6 +49,7 @@ func CopyFile(src, dst string)error{
 func CheckError(err error){
 	if err != nil{
 		log.Fatal(err)
+		os.Exit(-1)
 	}
 }
 

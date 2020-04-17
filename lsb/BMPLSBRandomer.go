@@ -14,17 +14,22 @@ type BMPLSBRandomer struct {
 	Seed string
 }
 
-func NewBMPLSBRandomer(bmp *image.BMP, seed string) (*BMPLSBRandomer, error){
+func NewBMPLSBRandomer(filename string, seed string) (*BMPLSBRandomer, error){
+	image, err := image.New(filename)
+	if err != nil {
+		return nil, err
+	}
 	lsb := &BMPLSBRandomer{
-		Bmp : bmp,
+		Bmp : image,
 		Seed : seed,
 	}
 
-	err := lsb.Bmp.SetSeekAtStartAddress()
+	err = lsb.Bmp.SetSeekAtStartAddress()
 	if err != nil{
 		return nil, err
 	}
 
+	fmt.Println(lsb.Bmp.Seek)
 	return lsb, nil
 }
 
@@ -47,7 +52,10 @@ func (l *BMPLSBRandomer) InsertData(data []byte)(error){
 			if err != nil{
 				return err
 			}
-			l.writeBit(int32(bit))
+			err = l.writeBit(int32(bit))
+			if err != nil{
+				return err
+			}
 		}
 	}
 
@@ -55,14 +63,13 @@ func (l *BMPLSBRandomer) InsertData(data []byte)(error){
 	if err != nil{
 		return err
 	}
-
+	l.Bmp.Close()
 	return nil
 }
 
 func (l *BMPLSBRandomer) checkCapability(data []byte) bool{
 	return int64(len(data)) > (l.Bmp.Size / int64(8))
 }
-
 
 func (b *BMPLSBRandomer) writeBit(bit int32)(error){
 	buf:= make([]byte, 1)
@@ -80,7 +87,7 @@ func (b *BMPLSBRandomer) writeBit(bit int32)(error){
 	if err != nil && err != io.EOF{
 		return err
 	}
-
+	
 	return nil
 }
 
@@ -108,7 +115,7 @@ func (l *BMPLSBRandomer) RetriveData(lenght int)(msg []byte, err error){
 	if err != nil{
 		return nil, err
 	}
-
+	l.Bmp.Close()
 	return msg, nil
 }
 
