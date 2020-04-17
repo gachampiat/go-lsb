@@ -65,7 +65,7 @@ func GetLsb(value byte)byte{
 	return  value << 7 >> 7
 }
 
-func GetValidRand(number int, array []int)bool{
+func GetValidRand(number int64, array []int64)bool{
 	for _, value := range(array){
 		if number == value{
 			return false

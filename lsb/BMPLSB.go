@@ -29,34 +29,31 @@ func NewBMP(filename string) (*BMPLSB, error){
 	return lsb, nil 
 }
 
-func (l *BMPLSB) InsertData(data []byte)(error){
-	if l.checkCapability(data){
+func (b BMPLSB) InsertData(data []byte)(error){
+	if b.checkCapability(data){
 		return fmt.Errorf("Please choose another stego-medium")
 	}
 	for _, bits := range data{
 		var i uint8
 		for i = 0; i < 8; i++ {
 			bit := (bits & byte(1<<i)) >> i
-			err := l.writeBit(int32(bit))
+			err := b.writeBit(int32(bit))
 			if err != nil{
 				return err
 			}
 		}
 	}
 
-	err := l.Bmp.SetSeekAtStartAddress()
+	err := b.Bmp.SetSeekAtStartAddress()
 	if err != nil{
 		return err
 	}
-	l.Bmp.Close()
+	b.Bmp.Close()
 	return nil
-}func (b *BMP) GetSeekValue() int64 {
-	b.UpdateSeekValue()
-	return b.Seek
 }
 
-func (l *BMPLSB) checkCapability(data []byte) bool{
-	return int64(len(data)) > (l.Bmp.Size / int64(8))
+func (b *BMPLSB) checkCapability(data []byte) bool{
+	return int64(len(data)) > (b.Bmp.Size / int64(8))
 }
 
 func (b *BMPLSB) writeBit(bit int32)(error){
@@ -79,7 +76,7 @@ func (b *BMPLSB) writeBit(bit int32)(error){
 	return nil
 }
 
-func (b *BMPLSB) RetriveData(lenght int)(msg []byte, err error){
+func (b BMPLSB) RetriveData(lenght int)(msg []byte, err error){
 	for i := 0; i < lenght; i++{
 		buf := b.ReadNBytes(8)
 		msg = append(msg, byte(utils.ByteSliceToInt(buf)))
@@ -93,20 +90,20 @@ func (b *BMPLSB) RetriveData(lenght int)(msg []byte, err error){
 	return msg, nil
 }
 
-func (l *BMPLSB) ReadNBytes(n int)([]byte){
+func (b *BMPLSB) ReadNBytes(n int)([]byte){
 	buf := make([]byte, n + 1)
 	for i:= n  ; i > 0; i--{
-		buf[i] = l.ReadByte()
+		buf[i] = b.ReadByte()
 	}
 
 	return buf
 
 }
 
-func (l *BMPLSB) ReadByte()(byte){
+func (b *BMPLSB) ReadByte()(byte){
 	buf:= make([]byte, 1)
-	l.Bmp.UpdateSeekValue()
-	_, err := l.Bmp.File.Read(buf)
+	b.Bmp.UpdateSeekValue()
+	_, err := b.Bmp.File.Read(buf)
 	if err != nil{
 		fmt.Errorf("%s",err)
 	}
