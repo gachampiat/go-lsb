@@ -66,14 +66,14 @@ func insert(key, seed string, argv []string){
 
 	var LSB lsb.Ilsb
 
+	LSB, err = lsb.NewBMP(argv[0])
+	utils.CheckError(err)
+
 	if randomise {
-		LSB, err = lsb.NewBMPLSBRandomer(argv[1], seed)
-		utils.CheckError(err)
-		
-	} else {
-		LSB, err = lsb.NewBMP(argv[1])
+		LSB, err = lsb.NewBMPLSBRandomer(LSB.(*lsb.BMPLSB), seed)
 		utils.CheckError(err)
 	}
+	
 	err = LSB.InsertData(message)
 	utils.CheckError(err)
 }
@@ -89,7 +89,6 @@ func retrive(key, seed string, argv []string)[]byte{
         return nil
 	}
 
-	
 	encrypt := key != ""
 	randomise := seed != ""
 	msg_lenght, err := strconv.Atoi(argv[1])
@@ -97,12 +96,11 @@ func retrive(key, seed string, argv []string)[]byte{
 
 	var LSB lsb.Ilsb
 
-	if randomise {
-		LSB, err = lsb.NewBMPLSBRandomer(argv[0], seed)
-		utils.CheckError(err)
+	LSB, err = lsb.NewBMP(argv[0])
+	utils.CheckError(err)
 
-	} else {
-		LSB, err = lsb.NewBMP(argv[0])
+	if randomise {
+		LSB, err = lsb.NewBMPLSBRandomer(LSB.(*lsb.BMPLSB), seed)
 		utils.CheckError(err)
 	}
 
