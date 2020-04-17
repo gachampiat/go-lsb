@@ -6,6 +6,8 @@ import (
 	"log"
 	"strconv"
 	"hash/fnv"
+	"crypto/rc4"
+	
 )
 
 func Hash(s string) uint64 {
@@ -73,4 +75,14 @@ func GetValidRand(number int, array []int)bool{
 		}
 	}
 	return true
+}
+
+func RC4Encryption(key, src []byte)([]byte, error){
+	encrypt, err := rc4.NewCipher(key)
+	if err != nil{
+		return nil, err
+	}
+	dst := make([]byte, len(src))
+	encrypt.XORKeyStream(dst, src)
+	return dst, nil
 }
