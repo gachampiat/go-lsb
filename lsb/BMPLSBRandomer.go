@@ -4,9 +4,7 @@ import(
 	"math/rand"
 	"go-lsb/utils"
 	"strconv"
-	"strings"
-	"fmt"
-	
+	"strings"	
 )
 
 type BMPLSBRandomer struct {
