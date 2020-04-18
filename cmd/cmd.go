@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"flag"
 	"os"
-	"strconv"
 	"io/ioutil"
 
 	"go-lsb/utils"
@@ -77,7 +76,7 @@ func insert(key, seed string, argv []string){
 }
 
 func retrive(key, seed string, argv []string)[]byte{
-	if len(argv) != 2 {
+	if len(argv) != 1 {
 		flag.PrintDefaults()
 		return nil
 	}
@@ -89,12 +88,10 @@ func retrive(key, seed string, argv []string)[]byte{
 
 	encrypt := key != ""
 	randomise := seed != ""
-	msg_lenght, err := strconv.Atoi(argv[1])
-	utils.CheckError(err)
 
 	var LSB lsb.Ilsb
 
-	LSB, err = lsb.NewBMP(argv[0])
+	LSB, err := lsb.NewBMP(argv[0])
 	utils.CheckError(err)
 
 	if randomise {
@@ -102,8 +99,8 @@ func retrive(key, seed string, argv []string)[]byte{
 		utils.CheckError(err)
 	}
 
-	buf := make([]byte, msg_lenght)
-	buf, err = LSB.RetriveData(msg_lenght)
+	buf := make([]byte, 10)
+	buf, err = LSB.RetriveData()
 	utils.CheckError(err)
 
 	if encrypt {
