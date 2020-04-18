@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"io/ioutil"
 
-
 	"go-lsb/utils"
 	"go-lsb/lsb"
 )
@@ -42,7 +41,7 @@ func insert(key, seed string, argv []string){
 		fmt.Println(err)
         return
 	}
-	
+
 	err := utils.CopyFile(argv[0], argv[1])
 	utils.CheckError(err)
 
@@ -66,14 +65,13 @@ func insert(key, seed string, argv []string){
 
 	var LSB lsb.Ilsb
 
-	LSB, err = lsb.NewBMP(argv[0])
+	LSB, err = lsb.NewBMP(argv[1])
 	utils.CheckError(err)
 
 	if randomise {
 		LSB, err = lsb.NewBMPLSBRandomer(LSB.(*lsb.BMPLSB), seed)
 		utils.CheckError(err)
 	}
-	
 	err = LSB.InsertData(message)
 	utils.CheckError(err)
 }

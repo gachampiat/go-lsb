@@ -1,13 +1,11 @@
 package utils
 
 import (
-	"fmt"
 	"os"
 	"log"
 	"hash/fnv"
 	"crypto/rc4"
-	"io"
-	
+	"io"	
 )
 
 func Hash(s string) uint64 {
@@ -17,32 +15,23 @@ func Hash(s string) uint64 {
 }
 
 func CopyFile(src, dst string)error{
-	buf := make([]byte, 100)
+	in, err := os.Open(src)
+    if err != nil {
+        return err
+    }
+    defer in.Close()
 
-	destination, err := os.Create(dst)
-	if err != nil {
-		return fmt.Errorf("Impossible to create the file %s", dst)
-	}
+    out, err := os.Create(dst)
+    if err != nil {
+        return err
+    }
+    defer out.Close()
 
-	f, err := os.Open(src)
-	if err != nil {
-		return fmt.Errorf("Impossible to open the file %s", src)
-	}
-
-	for {
-		n, err := f.Read(buf)
-		if err != nil && err != io.EOF{
-				return err
-		}
-		if n == 0 {
-				break
-		}
-
-		if _, err := destination.Write(buf[:n]); err != nil {
-				return err
-		}
-	}
-	return nil 
+    _, err = io.Copy(out, in)
+    if err != nil {
+        return err
+    }
+    return out.Close()
 }
 
 func CheckError(err error){
