@@ -44,7 +44,6 @@ func (b BMPLSB) InsertData(data []byte)(error){
 	}
 	for _, bits := range append(buf, data...){
 		var i uint8
-		fmt.Printf("%v\n", bits)
 		for i = 0; i < 8; i++ {
 			bit := (bits & byte(1<<i)) >> i
 			err := b.writeBit(int32(bit))

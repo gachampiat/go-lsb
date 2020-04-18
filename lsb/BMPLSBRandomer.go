@@ -5,6 +5,7 @@ import(
 	"go-lsb/utils"
 	"strconv"
 	"strings"
+	"fmt"
 	
 )
 
@@ -27,12 +28,12 @@ func (b BMPLSBRandomer) Detect()bool{
 }
 
 func (b BMPLSBRandomer) InsertData(data []byte)(error){
-	buf, err := b.BmpLsb.ComputeHeader(data)
+	header, err := b.BmpLsb.ComputeHeader(data)
 	if err != nil {
 		return err
 	}
 	index_used := make([]int64, 10)
-	for _, bits := range append(buf, data...){
+	for _, bits := range append(header, data...){
 		var i uint8
 		for i = 0; i < 8; i++ {
 			bit := (bits & byte(1<<i)) >> i
@@ -65,7 +66,6 @@ func (b BMPLSBRandomer) RetriveData()(msg []byte, err error){
 		}
 		msg = append(msg, byte(utils.ByteSliceToInt(buf)))
 	}
-	
 	lenght, err := strconv.Atoi(strings.Trim(string(msg), "\x00"))
 	if err != nil{
 		return nil, err

@@ -56,7 +56,6 @@ func insert(key, seed string, argv []string){
 	encrypt := key != ""
 	randomise := seed != ""
 	
-	
 	if encrypt {
 		message, err = utils.RC4Encryption([]byte(key), message)
 		utils.CheckError(err)
