@@ -25,6 +25,8 @@ func Execute() {
 		detect(flag.Args())
 	} else if *rtve {
 		log.Printf("%s\n", retrive(*key, *seed, flag.Args()))
+	} else {
+		flag.PrintDefaults()
 	}
 }
 
