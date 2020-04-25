@@ -2,6 +2,7 @@ package lsb
 
 import (
 	"bytes"
+	"log"
 	"fmt"
 	"io"
 	"math"
@@ -40,8 +41,7 @@ func (b BMPLSB) Detect() bool {
 	b.Bmp.SetSeekValue(0)
 	img, err := bmp.Decode(b.Bmp.File)
 	if err != nil {
-		fmt.Println(err)
-		return false
+		log.Fatal(err)
 	}
 
 	bounds := img.Bounds()
@@ -76,8 +76,7 @@ func (b BMPLSB) Detect() bool {
 	}
 
 	if k == 0 {
-		fmt.Println("SPA Failed")
-		return false
+		log.Fatal("SPA FAILED")
 	}
 
 	a := float64(2 * k)
@@ -88,18 +87,17 @@ func (b BMPLSB) Detect() bool {
 	bm := (-complex(bBis, 0) - cmplx.Sqrt(complex(math.Pow(bBis, 2)-4*a*c, 0))) / complex(2*a, 0)
 
 	beta := math.Min(math.Abs(real(bp)), math.Abs(real(bm)))
-	fmt.Printf("Estimated embedding rate: %v \n", beta)
+	log.Printf("Estimated embedding rate: %v \n", beta)
 	return beta > 0.05
 }
 
-// img.At(x, y).RGBA() returns four uint32 values; we want a Pixel
 func rgbaToPixel(r uint32, g uint32, b uint32, a uint32) Pixel {
 	return Pixel{[]int{int(r / 257), int(g / 257), int(b / 257), int(a / 257)}}
 }
 
-// Pixel struct example
-
 func (b BMPLSB) InsertData(data []byte) error {
+	defer b.Bmp.Close()
+
 	buf, err := b.ComputeHeader(data)
 	if err != nil {
 		return err
@@ -115,13 +113,14 @@ func (b BMPLSB) InsertData(data []byte) error {
 		}
 	}
 
-	b.Bmp.Close()
 	return nil
 }
 
-func (b *BMPLSB) checkCapability(lenght int64) bool {
-	fmt.Printf("Text lenght = %d Maximal data on the image = %d \n", lenght, uint64(b.Bmp.Size)/uint64(8))
-	return lenght > (b.Bmp.Size / int64(8))
+func (b *BMPLSB) checkCapability(lenght uint64) bool {
+	log.Printf("Taille du message = %d \n", lenght)
+	log.Printf("Nombre de pixel dans l'image = %d \n", b.Bmp.Size)
+	log.Printf("Taux Stéganographique = %f \n", float64(lenght)/float64(b.Bmp.Size))
+	return lenght > (uint64(b.Bmp.Size) / uint64(8))
 }
 
 func (b *BMPLSB) writeBit(bit int32) error {
@@ -153,7 +152,7 @@ func (b BMPLSB) ComputeHeader(data []byte) ([]byte, error) {
 		padding = append(padding, buf...)
 	}
 
-	if b.checkCapability(int64(len(data) + len(padding))) {
+	if b.checkCapability(uint64(len(data) + len(padding))) {
 		return nil, fmt.Errorf("Please choose another stego-medium")
 	}
 
@@ -175,10 +174,6 @@ func (b BMPLSB) RetriveData() (msg []byte, err error) {
 		msg = append(msg, byte(utils.ByteSliceToInt(buf)))
 	}
 
-	err = b.Bmp.SetSeekAtStartAddress()
-	if err != nil {
-		return nil, err
-	}
 	b.Bmp.Close()
 	return msg, nil
 }

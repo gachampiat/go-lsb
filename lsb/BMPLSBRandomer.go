@@ -35,7 +35,7 @@ func (b BMPLSBRandomer) InsertData(data []byte) error {
 		var i uint8
 		for i = 0; i < 8; i++ {
 			bit := (bits & byte(1<<i)) >> i
-			number := getNextInt(b.BmpLsb.Bmp.Size, index_used)
+			number := getNextInt(int64(b.BmpLsb.Bmp.Size), index_used)
 			err := b.BmpLsb.Bmp.SetSeekValue(number)
 			if err != nil {
 				return err
@@ -55,7 +55,7 @@ func (b BMPLSBRandomer) RetriveData() (msg []byte, err error) {
 	for i := 0; i < HEADER_SIZE; i++ {
 		buf := make([]byte, 8)
 		for j := 0; j < 8; j++ {
-			number := getNextInt(b.BmpLsb.Bmp.Size, index_used)
+			number := getNextInt(int64(b.BmpLsb.Bmp.Size), index_used)
 			err := b.BmpLsb.Bmp.SetSeekValue(number)
 			if err != nil {
 				return nil, err
@@ -68,11 +68,12 @@ func (b BMPLSBRandomer) RetriveData() (msg []byte, err error) {
 	if err != nil {
 		return nil, err
 	}
+
 	msg = []byte{}
 	for i := 0; i < lenght; i++ {
 		buf := make([]byte, 8)
 		for j := 0; j < 8; j++ {
-			number := getNextInt(b.BmpLsb.Bmp.Size, index_used)
+			number := getNextInt(int64(b.BmpLsb.Bmp.Size), index_used)
 			err := b.BmpLsb.Bmp.SetSeekValue(number)
 			if err != nil {
 				return nil, err

@@ -3,13 +3,14 @@ package image
 import (
 	"encoding/binary"
 	"fmt"
+	"log"
 	"os"
 )
 
 type BMPParser struct {
 	File  *os.File
-	Start int64
-	Size  int64
+	Start uint64
+	Size  uint64
 	Seek  int64
 }
 
@@ -31,9 +32,9 @@ func New(path string) (*BMPParser, error) {
 	}
 
 	return &BMPParser{
-		File:  f,
-		Start: int64(binary.BigEndian.Uint32(start)),
-		Size:  stat.Size() - int64(binary.BigEndian.Uint32(start)),
+		File: f,
+		Start: uint64(binary.LittleEndian.Uint32(start)),
+		Size: uint64(stat.Size()) - uint64(binary.LittleEndian.Uint32(start)),
 	}, nil
 }
 
@@ -42,7 +43,7 @@ func (b *BMPParser) Close() {
 }
 
 func (b *BMPParser) SetSeekAtStartAddress() error {
-	if _, err := b.File.Seek(b.Start, 0); err != nil {
+	if _, err := b.File.Seek(int64(b.Start), 0); err != nil {
 		return err
 	} else {
 		b.UpdateSeekValue()
@@ -52,8 +53,7 @@ func (b *BMPParser) SetSeekAtStartAddress() error {
 
 func (b *BMPParser) UpdateSeekValue() {
 	if n, err := b.File.Seek(0, 1); err != nil {
-		fmt.Printf("Error update value seek : %s \n", err)
-		os.Exit(-1)
+		log.Fatalf("Error update value seek : %s \n", err)
 	} else {
 		b.Seek = n
 	}

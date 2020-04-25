@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"flag"
-	"fmt"
+	"log"
 	"io/ioutil"
 	"os"
 
@@ -24,7 +24,7 @@ func Execute() {
 	} else if *dct {
 		detect(flag.Args())
 	} else if *rtve {
-		fmt.Printf("%s\n", retrive(*key, *seed, flag.Args()))
+		log.Printf("%s\n", retrive(*key, *seed, flag.Args()))
 	}
 }
 
@@ -35,8 +35,7 @@ func detect(argv []string) {
 	}
 
 	if _, err := os.Stat(argv[0]); os.IsNotExist(err) {
-		fmt.Println(err)
-		return
+		log.Fatal(err)
 	}
 
 	var LSB lsb.Ilsb
@@ -45,7 +44,7 @@ func detect(argv []string) {
 	utils.CheckError(err)
 
 	stego := LSB.Detect()
-	fmt.Println(stego)
+	log.Println(stego)
 
 }
 
@@ -56,16 +55,14 @@ func insert(key, seed string, argv []string) {
 	}
 
 	if _, err := os.Stat(argv[0]); os.IsNotExist(err) {
-		fmt.Println(err)
-		return
+		log.Fatal(err)
 	}
 
 	err := utils.CopyFile(argv[0], argv[1])
 	utils.CheckError(err)
 
 	if _, err := os.Stat(argv[2]); os.IsNotExist(err) {
-		fmt.Println(err)
-		return
+		log.Fatal(err)
 	}
 
 	message := make([]byte, 20)
@@ -91,6 +88,7 @@ func insert(key, seed string, argv []string) {
 	}
 	err = LSB.InsertData(message)
 	utils.CheckError(err)
+	log.Println("Message insérée")
 }
 
 func retrive(key, seed string, argv []string) []byte {
@@ -100,8 +98,7 @@ func retrive(key, seed string, argv []string) []byte {
 	}
 
 	if _, err := os.Stat(argv[0]); os.IsNotExist(err) {
-		fmt.Println(err)
-		return nil
+		log.Fatal(err)
 	}
 
 	encrypt := key != ""
