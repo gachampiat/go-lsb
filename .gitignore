@@ -17,3 +17,8 @@
 
 # Generated image
 lsb_*.bmp
+*.bmp
+*.txt
+*.py
+*.tex
+go-lsb
