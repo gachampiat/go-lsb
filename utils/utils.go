@@ -5,7 +5,7 @@ import (
 	"log"
 	"hash/fnv"
 	"crypto/rc4"
-	"io"	
+	"io"
 )
 
 func Hash(s string) uint64 {

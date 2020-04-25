@@ -1,8 +1,11 @@
 package lsb
 
-
 type Ilsb interface {
-	InsertData(data []byte)(error)
-	RetriveData()(msg []byte, err error)
-	Detect()bool
+	InsertData(data []byte) error
+	RetriveData() (msg []byte, err error)
+	Detect() bool
+}
+
+type Pixel struct {
+	RGBA []int
 }

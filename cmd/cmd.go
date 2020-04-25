@@ -1,36 +1,55 @@
 package cmd
 
 import (
-	"fmt"
 	"flag"
-	"os"
+	"fmt"
 	"io/ioutil"
+	"os"
 
-	"go-lsb/utils"
 	"go-lsb/lsb"
+	"go-lsb/utils"
 )
 
-func Execute(){
+func Execute() {
 	inst := flag.Bool("insert", false, "Insertion de données\nUsage : -insert $src_file $dst_file $msg_file")
-	rtve := flag.Bool("retrive", false, "Recupération de données\nUsage : -retrive $src_file $msg_lenght")
+	rtve := flag.Bool("retrive", false, "Recupération de données\nUsage : -retrive $src_file")
 	key := flag.String("key", "", "Chiffrer l'entrée utilisateur\nUsage : -key $key")
 	seed := flag.String("seed", "", "Insertion aléatoire des données\nUsage : -seed $seed")
+	dct := flag.Bool("detect", false, "Détection d'un message dans une image\nUsage : -detect $img_src")
 
 	flag.Parse()
 
-	if *rtve == *inst{
-		flag.PrintDefaults()
-		return 
-	}
-
-	if *inst{
+	if *inst {
 		insert(*key, *seed, flag.Args())
-	} else {
+	} else if *dct {
+		detect(flag.Args())
+	} else if *rtve {
 		fmt.Printf("%s\n", retrive(*key, *seed, flag.Args()))
 	}
 }
 
-func insert(key, seed string, argv []string){
+func detect(argv []string) {
+	if len(argv) != 1 {
+		flag.PrintDefaults()
+		return
+	}
+
+	if _, err := os.Stat(argv[0]); os.IsNotExist(err) {
+		fmt.Println(err)
+		return
+	}
+
+	var LSB lsb.Ilsb
+
+	LSB, err := lsb.NewBMP(argv[0])
+	utils.CheckError(err)
+
+	stego := LSB.Detect()
+	fmt.Println(stego)
+
+}
+
+func insert(key, seed string, argv []string) {
 	if len(argv) != 3 {
 		flag.PrintDefaults()
 		return
@@ -38,7 +57,7 @@ func insert(key, seed string, argv []string){
 
 	if _, err := os.Stat(argv[0]); os.IsNotExist(err) {
 		fmt.Println(err)
-        return
+		return
 	}
 
 	err := utils.CopyFile(argv[0], argv[1])
@@ -46,16 +65,16 @@ func insert(key, seed string, argv []string){
 
 	if _, err := os.Stat(argv[2]); os.IsNotExist(err) {
 		fmt.Println(err)
-        return
+		return
 	}
 
 	message := make([]byte, 20)
 	message, err = ioutil.ReadFile(argv[2])
 	utils.CheckError(err)
-	
+
 	encrypt := key != ""
 	randomise := seed != ""
-	
+
 	if encrypt {
 		message, err = utils.RC4Encryption([]byte(key), message)
 		utils.CheckError(err)
@@ -74,7 +93,7 @@ func insert(key, seed string, argv []string){
 	utils.CheckError(err)
 }
 
-func retrive(key, seed string, argv []string)[]byte{
+func retrive(key, seed string, argv []string) []byte {
 	if len(argv) != 1 {
 		flag.PrintDefaults()
 		return nil
@@ -82,7 +101,7 @@ func retrive(key, seed string, argv []string)[]byte{
 
 	if _, err := os.Stat(argv[0]); os.IsNotExist(err) {
 		fmt.Println(err)
-        return nil
+		return nil
 	}
 
 	encrypt := key != ""

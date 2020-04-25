@@ -4,7 +4,6 @@ import (
 	"go-lsb/cmd"
 )
 
-func main(){
+func main() {
 	cmd.Execute()
-
-}	
+}
