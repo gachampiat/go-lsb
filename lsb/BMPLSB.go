@@ -119,7 +119,7 @@ func (b BMPLSB) InsertData(data []byte) error {
 func (b *BMPLSB) checkCapability(lenght uint64) bool {
 	log.Printf("Taille du message = %d \n", lenght)
 	log.Printf("Nombre de pixel dans l'image = %d \n", b.Bmp.Size)
-	log.Printf("Taux Stéganographique = %f \n", float64(lenght)/float64(b.Bmp.Size))
+	log.Printf("Taux Stéganographique = %f bits par pixel \n", float64(lenght)/(float64(b.Bmp.Size)/3))
 	return lenght > (uint64(b.Bmp.Size) / uint64(8))
 }
 
