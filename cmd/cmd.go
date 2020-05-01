@@ -1,15 +1,21 @@
+// Package cmd permet de définir toutes les intéractions
+// possible depuis la ligne de commande.
 package cmd
 
 import (
 	"flag"
-	"log"
 	"io/ioutil"
+	"log"
 	"os"
 
-	"go-lsb/lsb"
-	"go-lsb/utils"
+	"github.com/gachampiat/go-lsb/utils"
+
+	"github.com/gachampiat/go-lsb/lsb"
 )
 
+// Execute est la fonction principale de ce package
+// elle permet d'appeller les fonctionnalités en fonction
+// des flags passés à la cmd.
 func Execute() {
 	inst := flag.Bool("insert", false, "Insertion de données\nUsage : -insert $src_file $dst_file $msg_file")
 	rtve := flag.Bool("retrive", false, "Recupération de données\nUsage : -retrive $src_file")
@@ -45,8 +51,7 @@ func detect(argv []string) {
 	LSB, err := lsb.NewBMP(argv[0])
 	utils.CheckError(err)
 
-	stego := LSB.Detect()
-	log.Println(stego)
+	LSB.Detect()
 
 }
 

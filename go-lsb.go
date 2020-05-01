@@ -1,9 +1,11 @@
+// Package main
 package main
 
 import (
-	"go-lsb/cmd"
+	"github.com/gachampiat/go-lsb/cmd"
 )
 
+// Fonction principale
 func main() {
 	cmd.Execute()
 }
