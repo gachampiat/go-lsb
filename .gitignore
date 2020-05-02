@@ -14,4 +14,14 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
+
 *.zip
+#
+
+# Generated image
+lsb_*.bmp
+*.bmp
+*.txt
+*.py
+*.tex
+go-lsb
