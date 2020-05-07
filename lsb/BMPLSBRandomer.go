@@ -54,14 +54,14 @@ func (b BMPLSBRandomer) InsertData(data []byte) error {
 	}
 	// Pour stocker les index utilisés.
 	// Evite d'insérer des données au même endroit
-	indexUsed := make([]int64, 10)
+	indexUsed := make([]int64, 0)
 	for _, bits := range append(header, data...) {
 		// Pour stocker les valeurs de chaque bit
 		var i uint8
 		// une boucle de 8 car un byte = 8 bits
 		for i = 0; i < 8; i++ {
 			bit := (bits & byte(1<<i)) >> i
-			number := getNextInt(int64(b.BmpLsb.Bmp.Start), int64(b.BmpLsb.Bmp.Size), indexUsed)
+			number := getNextInt(int64(b.BmpLsb.Bmp.Start), int64(b.BmpLsb.Bmp.Size), &indexUsed)
 
 			// on update la valeur du seek dans le fichier
 			err := b.BmpLsb.Bmp.SetSeekValue(number)
@@ -85,13 +85,13 @@ func (b BMPLSBRandomer) RetriveData() (msg []byte, err error) {
 	defer b.BmpLsb.Bmp.Close()
 
 	// stocke les index déjà lu
-	indexUsed := make([]int64, 10)
+	indexUsed := make([]int64, 0)
 
 	// Permet de décoder le header
 	for i := 0; i < HeaderSize; i++ {
 		buf := make([]byte, 8)
 		for j := 0; j < 8; j++ {
-			number := getNextInt(b.BmpLsb.Bmp.Start, b.BmpLsb.Bmp.Size, indexUsed)
+			number := getNextInt(b.BmpLsb.Bmp.Start, b.BmpLsb.Bmp.Size, &indexUsed)
 			err := b.BmpLsb.Bmp.SetSeekValue(number)
 			if err != nil {
 				return nil, err
@@ -100,6 +100,7 @@ func (b BMPLSBRandomer) RetriveData() (msg []byte, err error) {
 		}
 		msg = append(msg, byte(utils.ByteSliceToInt(buf)))
 	}
+
 	// TODO : Trouver une meilleure solution.
 	// Permet de supprimer les octets nuls lors de la conversion
 	// bytes to string to int
@@ -112,7 +113,7 @@ func (b BMPLSBRandomer) RetriveData() (msg []byte, err error) {
 	for i := 0; i < lenght; i++ {
 		buf := make([]byte, 8)
 		for j := 0; j < 8; j++ {
-			number := getNextInt(b.BmpLsb.Bmp.Start, b.BmpLsb.Bmp.Size, indexUsed)
+			number := getNextInt(b.BmpLsb.Bmp.Start, b.BmpLsb.Bmp.Size, &indexUsed)
 			err := b.BmpLsb.Bmp.SetSeekValue(number)
 			if err != nil {
 				return nil, err
@@ -131,14 +132,12 @@ func (b BMPLSBRandomer) RetriveData() (msg []byte, err error) {
 // la valeur minimale + 1 et la valeur maximale et qui n'est pas
 // présente dans le tableau indexUsed. Une fois la valeur trouvé,
 // elle est automatiquement ajouté au tableau indexUsed.
-// Note: Par défaut en golang ce tableau est un pointeur, alors il
-// sera automatiquement mis à jour en dehors de la fonction.
-func getNextInt(minVal, maxVal int64, indexUsed []int64) int64 {
+func getNextInt(minVal, maxVal int64, indexUsed *[]int64) int64 {
 	number := rand.Int63n(maxVal-minVal+1) + minVal + 1
-	for !utils.InSlice(number, indexUsed) {
-		number = rand.Int63n(maxVal)
+	for utils.InSlice(number, *indexUsed) {
+		number = rand.Int63n(maxVal-minVal+1) + minVal + 1
 	}
 
-	indexUsed = append(indexUsed, number)
+	*indexUsed = append(*indexUsed, number)
 	return number
 }
