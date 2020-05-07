@@ -4,6 +4,7 @@ package cmd
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -30,7 +31,7 @@ func Execute() {
 	} else if *dct {
 		detect(flag.Args())
 	} else if *rtve {
-		log.Printf("%s\n", retrive(*key, *seed, flag.Args()))
+		fmt.Fprintf(os.Stdout, "%s\n", retrive(*key, *seed, flag.Args()))
 	} else {
 		flag.PrintDefaults()
 	}

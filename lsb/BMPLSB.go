@@ -202,10 +202,11 @@ func rgbaToPixel(r uint32, g uint32, b uint32, a uint32) Pixel {
 }
 
 func (b *BMPLSB) checkCapability(lenght uint64) bool {
-	log.Printf("Taille du message = %d \n", lenght)
-	log.Printf("Nombre de pixel dans l'image = %d \n", b.Bmp.Size)
-	fmt.Printf("Taux Stéganographique = %f bits par pixel \n", float64(lenght)/(float64(b.Bmp.Size)/3))
-	return lenght > (uint64(b.Bmp.Size) / uint64(8))
+	log.Printf("Taille du message en bits = %d \n", lenght*8)
+	log.Printf("Nombre d'octets dans l'image = %d \n", b.Bmp.Size)
+	bpp := float64(lenght*8) / (float64(b.Bmp.Size) / 3)
+	fmt.Printf("Taux Stéganographique = %f bits par pixel \n", bpp)
+	return bpp > 1
 }
 
 func (b *BMPLSB) writeBit(bit int32) error {
@@ -216,12 +217,13 @@ func (b *BMPLSB) writeBit(bit int32) error {
 		return err
 	}
 
+	// Permet de mettre le dernier bit à 0
 	var insert uint8 = byte(bit) | buf[0]>>1<<1
 	bufTemp := make([]byte, 0)
 	bufTemp = append(bufTemp, insert)
 
 	_, err = b.Bmp.File.Write(bufTemp)
-	if err != nil && err != io.EOF {
+	if err != nil {
 		return err
 	}
 
